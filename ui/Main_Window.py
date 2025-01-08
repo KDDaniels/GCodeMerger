@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget, QStatusBar, QFileDialog
+from util.merge import merge_gcode
 
 class Main_Window(QMainWindow):
     """
@@ -33,8 +34,9 @@ class Main_Window(QMainWindow):
 
 
     def generate_widgets(self):
-
-        ### Main container ###
+        """
+        Generates the widgets for the UI
+        """
         self.container_main = QWidget(self)
         self.setCentralWidget(self.container_main)
         self.layout_vert_main = QVBoxLayout(self.container_main)
@@ -48,6 +50,9 @@ class Main_Window(QMainWindow):
         
         
     def gen_file_select(self):
+        """
+        Generates the file selection section of the UI
+        """
         self.container_file_select = QWidget(self.container_main)
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -97,6 +102,9 @@ class Main_Window(QMainWindow):
 
 
     def gen_settings(self):
+        """
+        Generates the settings section of the UI
+        """
         # TODO: get tabs from ./tabs
 
         self.container_settings = QWidget(self.container_main)
@@ -126,6 +134,9 @@ class Main_Window(QMainWindow):
 
 
     def gen_output(self):
+        """
+        Generates the output section of the UI
+        """
         self.container_output = QWidget(self.container_main)
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -142,7 +153,8 @@ class Main_Window(QMainWindow):
         self.input_output_dir = QLineEdit(self.container_output)
         self.button_merge = QPushButton("Merge", self.container_output)
 
-        self.input_output_dir.setPlaceholderText("path/to/output.gcode")
+        self.input_output_dir.setPlaceholderText("output name")
+        self.input_output_dir.setText("output.gcode")
 
         self.layout_hor_output.addWidget(self.label_output)
         self.layout_hor_output.addWidget(self.button_select_output)
@@ -150,11 +162,18 @@ class Main_Window(QMainWindow):
         self.layout_hor_output.addWidget(self.button_merge)
 
         self.button_select_output.clicked.connect(lambda e: self.open_dir_dialog(self.input_output_dir))
+        self.button_merge.clicked.connect(lambda e: merge_gcode(self.input_file_one.text(),
+                                                                self.input_file_two.text(),
+                                                                self.input_output_dir.text(),
+                                                                self.get_settings()))
 
         self.layout_vert_main.addWidget(self.container_output)
 
 
     def open_file_dialog(self, input):
+        """
+        Opens the file dialog to select a G-code file
+        """
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Open File",
@@ -166,6 +185,9 @@ class Main_Window(QMainWindow):
             input.setText(file_path)
 
     def open_dir_dialog(self, input):
+        """
+        Opens the directory dialog to select output folder
+        """
         directory_path = QFileDialog.getExistingDirectory(
             self,
             "Select Directory",
@@ -177,8 +199,14 @@ class Main_Window(QMainWindow):
             if not input.text():
                 input.setText(directory_path + "/" + "merged.gcode")
             else:
-                # TODO: Handle repeat inputs, e.g. C:/output/file.gcodeC:/output/file.gcode
-                # maybe split last / and get whatever is after that, idk
-                input.setText(directory_path + "/" + input.text())
+                output_filename = input.text().split("/")
+                output_filename = output_filename[len(output_filename)-1]
+                input.setText(directory_path + "/" + output_filename)
 
 
+    def get_settings(self):
+        """
+        Returns all of the settings values
+        """
+        return{"test":"val",
+               "test2":"val2"}
