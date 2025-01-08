@@ -31,6 +31,7 @@ class Main_Window(QMainWindow):
 
         self.generate_widgets()
 
+
     def generate_widgets(self):
 
         ### Main container ###
@@ -38,9 +39,12 @@ class Main_Window(QMainWindow):
         self.setCentralWidget(self.container_main)
         self.layout_vert_main = QVBoxLayout(self.container_main)
 
-
-
-        ### File Select ###
+        self.gen_file_select()
+        self.gen_settings()
+        self.gen_output()
+        
+        
+    def gen_file_select(self):
         self.container_file_select = QWidget(self.container_main)
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -81,8 +85,7 @@ class Main_Window(QMainWindow):
         self.layout_vert_main.addWidget(self.container_file_select)
 
 
-
-        ### Settings ###
+    def gen_settings(self):
         # TODO: get tabs from ./tabs
 
         self.container_settings = QWidget(self.container_main)
@@ -104,8 +107,8 @@ class Main_Window(QMainWindow):
 
         self.layout_vert_main.addWidget(self.container_settings)
 
-        
-        ### Output ###
+
+    def gen_output(self):
         self.container_output = QWidget(self.container_main)
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -128,4 +131,3 @@ class Main_Window(QMainWindow):
         self.layout_hor_output.addWidget(self.button_merge)
 
         self.layout_vert_main.addWidget(self.container_output)
-        
