@@ -149,6 +149,8 @@ class Main_Window(QMainWindow):
         self.layout_hor_output.addWidget(self.input_output_dir)
         self.layout_hor_output.addWidget(self.button_merge)
 
+        self.button_select_output.clicked.connect(lambda e: self.open_dir_dialog(self.input_output_dir))
+
         self.layout_vert_main.addWidget(self.container_output)
 
 
@@ -156,13 +158,27 @@ class Main_Window(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Open File",
-            "",
+            "./input/",
             "G-code Files (*.gcode);;All Files (*)"
         )
         if file_path:
             self.status_bar.showMessage(f"Loaded {file_path}", 2000)
             input.setText(file_path)
 
+    def open_dir_dialog(self, input):
+        directory_path = QFileDialog.getExistingDirectory(
+            self,
+            "Select Directory",
+            "./output/",
+        )
 
+        if directory_path:
+            self.status_bar.showMessage(f"Output: {directory_path}", 2000)
+            if not input.text():
+                input.setText(directory_path + "/" + "merged.gcode")
+            else:
+                # TODO: Handle repeat inputs, e.g. C:/output/file.gcodeC:/output/file.gcode
+                # maybe split last / and get whatever is after that, idk
+                input.setText(directory_path + "/" + input.text())
 
 
