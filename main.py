@@ -26,6 +26,10 @@ from ui.Main_Window import Main_Window
 application_title = "GCodeMerger"
 application_version = "0.1.0"
 
+"""
+Main function
+Runs the program
+"""
 def main(title: str, version: str):
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
