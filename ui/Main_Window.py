@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget, QStatusBar, QFileDialog
 
 class Main_Window(QMainWindow):
     """
@@ -39,6 +39,9 @@ class Main_Window(QMainWindow):
         self.setCentralWidget(self.container_main)
         self.layout_vert_main = QVBoxLayout(self.container_main)
 
+        self.status_bar = QStatusBar(self)
+        self.setStatusBar(self.status_bar)
+
         self.gen_file_select()
         self.gen_settings()
         self.gen_output()
@@ -59,12 +62,16 @@ class Main_Window(QMainWindow):
         self.container_file_one = QHBoxLayout()
 
         self.label_file_one = QLabel("File One: ", self.container_file_select)
-        self.open_file_one = QPushButton("Load...", self.container_file_select)
+        self.open_file_one = QPushButton("Select...", self.container_file_select)
         self.input_file_one = QLineEdit(self.container_file_select)
+
+        self.input_file_one.setPlaceholderText("path/to/file1.gcode")
 
         self.container_file_one.addWidget(self.label_file_one)
         self.container_file_one.addWidget(self.open_file_one)
         self.container_file_one.addWidget(self.input_file_one)
+
+        self.open_file_one.clicked.connect(lambda e: self.open_file_dialog(self.input_file_one))
 
         self.layout_vert_select.addLayout(self.container_file_one)
 
@@ -72,12 +79,16 @@ class Main_Window(QMainWindow):
         self.container_file_two = QHBoxLayout()
 
         self.label_file_two = QLabel("File Two: ", self.container_file_select)
-        self.open_file_two = QPushButton("Load...", self.container_file_select)
+        self.open_file_two = QPushButton("Select...", self.container_file_select)
         self.input_file_two = QLineEdit(self.container_file_select)
+
+        self.input_file_two.setPlaceholderText("path/to/file2.gcode")
 
         self.container_file_two.addWidget(self.label_file_two)
         self.container_file_two.addWidget(self.open_file_two)
         self.container_file_two.addWidget(self.input_file_two)
+
+        self.open_file_two.clicked.connect(lambda e: self.open_file_dialog(self.input_file_two))
 
         self.layout_vert_select.addLayout(self.container_file_two)
 
@@ -100,8 +111,14 @@ class Main_Window(QMainWindow):
         self.layout_grid_settings = QGridLayout(self.container_settings)
         
         self.container_tabs = QTabWidget(self.container_settings)
+        """
+        in a loop, get the tab names and tab layout
+        or just settings_tab = SettingsTab
+        or whatever
 
-        # Insert tabs here #
+        tab = tab_layout
+        self.container_tabs.addTab(tab, tab.name)
+        """
 
         self.layout_grid_settings.addWidget(self.container_tabs, 0, 0, 1, 1)
 
@@ -125,9 +142,27 @@ class Main_Window(QMainWindow):
         self.input_output_dir = QLineEdit(self.container_output)
         self.button_merge = QPushButton("Merge", self.container_output)
 
+        self.input_output_dir.setPlaceholderText("path/to/output.gcode")
+
         self.layout_hor_output.addWidget(self.label_output)
         self.layout_hor_output.addWidget(self.button_select_output)
         self.layout_hor_output.addWidget(self.input_output_dir)
         self.layout_hor_output.addWidget(self.button_merge)
 
         self.layout_vert_main.addWidget(self.container_output)
+
+
+    def open_file_dialog(self, input):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            "",
+            "G-code Files (*.gcode);;All Files (*)"
+        )
+        if file_path:
+            self.status_bar.showMessage(f"Loaded {file_path}", 2000)
+            input.setText(file_path)
+
+
+
+
