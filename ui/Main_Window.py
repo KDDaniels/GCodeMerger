@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 GCodeMerger is mean to merge G-code files with some addition to make multi-color printing easier with a single filament printer.
 Copyright (C) 2025 Kendall Daniels
@@ -18,23 +16,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import sys
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QMainWindow
 
-from ui.Main_Window import Main_Window
+class Main_Window(QMainWindow):
+    def __init__(self, title):
+        super().__init__()
 
-application_title = "GCodeMerger"
-application_version = "0.1.0"
-
-def main(title: str, version: str):
-    app = QApplication(sys.argv)
-    app.setStyle('Fusion')
-    
-    main_window = Main_Window((title + " v" + version))
-    main_window.show()
-
-    sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    main(application_title, application_version)
+        self.setWindowTitle(title)
+        self.setGeometry(100, 100, 500, 400)
+        
+        
+        
