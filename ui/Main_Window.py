@@ -19,7 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget, QStatusBar, QFileDialog, QPlainTextEdit
 from util.merge import Merger
-from ui.tabs.pause_settings import Pause_Settings
 
 class Main_Window(QMainWindow):
     """
@@ -213,9 +212,6 @@ class Main_Window(QMainWindow):
                 output_filename = input.text().split("/")
                 output_filename = output_filename[len(output_filename)-1]
                 input.setText(directory_path + "/" + output_filename)
-
-    def load_settings(self):
-        self.settings_pause = Pause_Settings()
 
     def get_settings(self):
         """
