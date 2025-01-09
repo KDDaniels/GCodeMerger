@@ -34,32 +34,47 @@ class Merger:
             output   : path to output file
             settings : list of settings to apply
         """
-        one_lines = self.read_file(file_one)
-        two_lines = self.read_file(file_two)
+        try:
+            one_lines = self.read_file(file_one)
+            two_lines = self.read_file(file_two)
 
-        one_layers = self.get_line_index(one_lines, r"^;LAYER:\d+")
-        two_layers = self.get_line_index(two_lines, r"^;LAYER:\d+")
+            one_layers = self.get_line_index(one_lines, r"^;LAYER:\d+")
+            two_layers = self.get_line_index(two_lines, r"^;LAYER:\d+")
+            
+            ## Start G-code ##
+            start = "".join(one_lines[:one_layers[0]-1])
+            self.output_code += start
 
-        start = "".join(one_lines[:one_layers[0]-1])
-        self.output_code += start
+            ## End G-code ##
+            end = self.get_line_index(one_lines, r"^;TIME_ELAPSED:\d+")
+            end.append(self.get_line_index(one_lines, r"^;End of Gcode")[0]+1)
+            print(end)
+            end = "".join(one_lines[end[len(end)-2]+1:end[len(end)-1]])
+            print(end)
 
-        one = "".join(one_lines[one_layers[0]+1:one_layers[1]-1])
-        two = "".join(two_lines[two_layers[0]+1:two_layers[1]-1])
-        self.build_gcode(one, two, ";TEST\n;PAUSE\n;INJECTION", self.current_layer)
 
-        self.current_layer += 1
+            
+            # add for loop to build the code
+            
+
+            one = "".join(one_lines[one_layers[0]+1:one_layers[1]-1])
+            two = "".join(two_lines[two_layers[0]+1:two_layers[1]-1])
+            self.build_gcode(one, two, ";TEST\n;PAUSE\n;INJECTION", self.current_layer)
+
+            self.current_layer += 1
+            
+            one = "".join(one_lines[one_layers[1]+1:one_layers[2]-1])
+            two = "".join(two_lines[two_layers[1]+1:two_layers[2]-1])
+            self.build_gcode(one, two, ";TEST\n;PAUSE\n;INJECTION", self.current_layer)
+
+
+            self.write_file(output, self.output_code)
         
-        one = "".join(one_lines[one_layers[1]+1:one_layers[2]-1])
-        two = "".join(two_lines[two_layers[1]+1:two_layers[2]-1])
-        self.build_gcode(one, two, ";TEST\n;PAUSE\n;INJECTION", self.current_layer)
-
-
-        self.write_file(output, self.output_code)
-    
-        # for key, value in settings.items():
-        #     print(f"key: {key}\nval: {value}")
-
-        
+            # for key, value in settings.items():
+            #     print(f"key: {key}\nval: {value}")
+        except Exception as e:
+            # TODO: update the status bar with error message
+            print(f"[ERROR] {e}")
 
 
     def read_file(self, file_name):
