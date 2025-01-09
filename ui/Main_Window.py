@@ -16,8 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget, QStatusBar, QFileDialog
-from util.merge import merge_gcode
+import os
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy, QLabel, QPushButton, QLineEdit, QTabWidget, QStatusBar, QFileDialog, QPlainTextEdit
+from util.merge import Merger
+from ui.tabs.pause_settings import Pause_Settings
 
 class Main_Window(QMainWindow):
     """
@@ -29,7 +31,7 @@ class Main_Window(QMainWindow):
 
         self.setWindowTitle(title)
         self.setGeometry(100, 100, 500, 400)
-
+        self.merger = Merger()
         self.generate_widgets()
 
 
@@ -119,17 +121,25 @@ class Main_Window(QMainWindow):
         self.layout_grid_settings = QGridLayout(self.container_settings)
         
         self.container_tabs = QTabWidget(self.container_settings)
-        """
-        in a loop, get the tab names and tab layout
-        or just settings_tab = SettingsTab
-        or whatever
 
-        tab = tab_layout
-        self.container_tabs.addTab(tab, tab.name)
-        """
+        ## Pause ##
+        self.tab_pause = QWidget()
+        self.layout_tab_pause = QVBoxLayout(self.tab_pause)
+
+        self.label_pause = QLabel("Insert G-code for pausing", self.tab_pause)
+        self.input_pause_code = QPlainTextEdit(self.tab_pause)
+
+        self.layout_tab_pause.addWidget(self.label_pause)
+        self.layout_tab_pause.addWidget(self.input_pause_code)
+
+        self.input_pause_code.setPlaceholderText("Insert custom pause G-code")
+        self.input_pause_code.setPlainText("M0 ;Pause the print for filament swap")
+
+
+
+        self.container_tabs.addTab(self.tab_pause, "Pause")
 
         self.layout_grid_settings.addWidget(self.container_tabs, 0, 0, 1, 1)
-
         self.layout_vert_main.addWidget(self.container_settings)
 
 
@@ -162,7 +172,8 @@ class Main_Window(QMainWindow):
         self.layout_hor_output.addWidget(self.button_merge)
 
         self.button_select_output.clicked.connect(lambda e: self.open_dir_dialog(self.input_output_dir))
-        self.button_merge.clicked.connect(lambda e: merge_gcode(self.input_file_one.text(),
+        self.button_merge.clicked.connect(lambda e: 
+                                        self.merger.merge_gcode(self.input_file_one.text(),
                                                                 self.input_file_two.text(),
                                                                 self.input_output_dir.text(),
                                                                 self.get_settings()))
@@ -203,6 +214,8 @@ class Main_Window(QMainWindow):
                 output_filename = output_filename[len(output_filename)-1]
                 input.setText(directory_path + "/" + output_filename)
 
+    def load_settings(self):
+        self.settings_pause = Pause_Settings()
 
     def get_settings(self):
         """
